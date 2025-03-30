@@ -13,6 +13,8 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("🧥 Asistente Virtual - Tienda de Ropa")
 
+st.warning("Versión cargada correctamente ✅")
+
 # Paso 1: Solicitar NIF
 nif = st.text_input("🔐 Por favor, introduce tu NIF para comenzar:").strip().upper()
 
