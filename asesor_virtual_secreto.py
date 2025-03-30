@@ -11,9 +11,9 @@ imagenes_df = pd.read_excel("Imagenes_Drive_Convertidas.xlsx")
 # Conectar con OpenAI
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.title("👔 Asistente Virtual - Tienda de Ropa")
+st.title("👕 Asistente Virtual - Tienda de Ropa")
 
-# Campo obligatorio para el NIF antes de continuar
+# Campo obligatorio para el NIF antes de mostrar cualquier otra cosa
 nif = st.text_input("🪪 Por favor, introduce tu NIF para comenzar:").strip().upper()
 
 if not nif:
@@ -32,8 +32,6 @@ nombre = cliente.iloc[0]["Nombre"]
 estilo = cliente.iloc[0]["Estilo favorito"]
 ciudad = cliente.iloc[0]["Ciudad"]
 
-depto = cliente.iloc[0]["Departamento"] if "Departamento" in cliente.columns else "General"
-
 compras = historial_df[historial_df["NIF Cliente"] == nif]
 prenda_anterior = None
 if not compras.empty:
@@ -44,17 +42,15 @@ if not compras.empty:
 
 st.markdown(f"👋 ¡Hola, {nombre}! Encantado de verte por aquí.")
 if prenda_anterior:
-    st.markdown(f"🧾 Veo que tu última compra fue: **{prenda_anterior}**. ¡Buena elección!")
+    st.markdown(f"🧥 Veo que tu última compra fue: **{prenda_anterior}**. ¡Buena elección!")
 
 # Campo de mensaje del cliente
 mensaje_usuario = st.text_input("💬 ¿Qué estás buscando hoy?")
-
 if mensaje_usuario:
     prompt = f"""
 Eres un asesor comercial en una tienda de ropa.
 El cliente se llama {nombre}, vive en {ciudad}, y su estilo favorito es {estilo}.
 Su última compra fue: {prenda_anterior if prenda_anterior else "N/A"}.
-Departamento: {depto}.
 
 Tu tarea es recomendarle entre 2 y 3 prendas de nuestro catálogo, en base a su estilo,
 el mensaje del cliente: \"{mensaje_usuario}\" y nuestro inventario.
@@ -69,9 +65,6 @@ Este modelo podría gustarte:
 ![nombre](URL)
 """
 
-    st.markdown("### 🧠 Prompt enviado al modelo (debug):")
-    st.code(prompt)
-
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -80,6 +73,5 @@ Este modelo podría gustarte:
         ]
     )
     respuesta = response.choices[0].message.content
-
-    st.markdown("### 👗 Recomendación del asesor:")
+    st.markdown("### 🧠 Recomendación del asesor:")
     st.markdown(respuesta)
