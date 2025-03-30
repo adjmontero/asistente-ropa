@@ -2,17 +2,17 @@ import streamlit as st
 import pandas as pd
 from openai import OpenAI
 
-# Cargar datos
-clientes_df = pd.read_excel("AsistenteVirtual_DB (1).xlsx", sheet_name="Clientes")
-historial_df = pd.read_excel("AsistenteVirtual_DB (1).xlsx", sheet_name="HistorialCompras")
-ropa_df = pd.read_excel("AsistenteVirtual_DB (1).xlsx", sheet_name="Ropa")
+# Cargar datos desde el archivo renombrado
+clientes_df = pd.read_excel("AsistenteVirtual_DB.xlsx", sheet_name="Clientes")
+historial_df = pd.read_excel("AsistenteVirtual_DB.xlsx", sheet_name="HistorialCompras")
+ropa_df = pd.read_excel("AsistenteVirtual_DB.xlsx", sheet_name="Ropa")
 imagenes_df = pd.read_excel("Imagenes_Drive_Convertidas.xlsx")
 
 # Conectar con OpenAI
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
+# Título y mensaje de versión
 st.title("🧥 Asistente Virtual - Tienda de Ropa")
-
 st.warning("Versión cargada correctamente ✅")
 
 # Paso 1: Solicitar NIF
