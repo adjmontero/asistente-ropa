@@ -11,13 +11,13 @@ imagenes_df = pd.read_excel("Imagenes_Drive_Convertidas.xlsx")
 # Conectar con OpenAI
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.title("👕 Asistente Virtual - Tienda de Ropa")
+st.title("🧥 Asistente Virtual - Tienda de Ropa")
 
-# Campo obligatorio para el NIF antes de mostrar cualquier otra cosa
-nif = st.text_input("🪪 Por favor, introduce tu NIF para comenzar:").strip().upper()
+# Paso 1: Solicitar NIF
+nif = st.text_input("🔐 Por favor, introduce tu NIF para comenzar:").strip().upper()
 
 if not nif:
-    st.info("⌛ Esperando a que introduzcas tu NIF para comenzar la atención personalizada.")
+    st.info("🕓 Esperando a que introduzcas tu NIF para comenzar la atención personalizada.")
     st.stop()
 
 clientes_df["NIF"] = clientes_df["NIF"].astype(str).str.strip().str.upper()
@@ -27,7 +27,7 @@ if cliente.empty:
     st.error(f"❌ No encontramos el NIF **{nif}** en nuestra base de datos. ¿Te gustaría registrarte?")
     st.stop()
 
-# Si el NIF es válido, continuar
+# Paso 2: Datos del cliente
 nombre = cliente.iloc[0]["Nombre"]
 estilo = cliente.iloc[0]["Estilo favorito"]
 ciudad = cliente.iloc[0]["Ciudad"]
@@ -40,29 +40,29 @@ if not compras.empty:
     if not prenda_info.empty:
         prenda_anterior = prenda_info.iloc[0]["Nombre"]
 
+# Saludo personalizado
 st.markdown(f"👋 ¡Hola, {nombre}! Encantado de verte por aquí.")
 if prenda_anterior:
-    st.markdown(f"🧥 Veo que tu última compra fue: **{prenda_anterior}**. ¡Buena elección!")
+    st.markdown(f"🧾 Veo que tu última compra fue: **{prenda_anterior}**. ¡Buena elección!")
 
-# Campo de mensaje del cliente
-mensaje_usuario = st.text_input("💬 ¿Qué estás buscando hoy?")
+# Campo de mensaje
+mensaje_usuario = st.text_input("📝 ¿Qué estás buscando hoy?")
+
 if mensaje_usuario:
     prompt = f"""
-Eres un asesor comercial en una tienda de ropa.
-El cliente se llama {nombre}, vive en {ciudad}, y su estilo favorito es {estilo}.
+Eres un asesor comercial en una tienda de ropa. El cliente se llama {nombre}, vive en {ciudad} y su estilo favorito es {estilo}.
 Su última compra fue: {prenda_anterior if prenda_anterior else "N/A"}.
 
-Tu tarea es recomendarle entre 2 y 3 prendas de nuestro catálogo, en base a su estilo,
-el mensaje del cliente: \"{mensaje_usuario}\" y nuestro inventario.
+Tu tarea es recomendarle entre 2 y 3 prendas del inventario, en base a su estilo, el mensaje del cliente: "{mensaje_usuario}" y nuestro catálogo.
 
-Solo puedes mostrar imágenes de prendas que tengan un ID en el archivo 'Imagenes_Drive_Convertidas.xlsx'.
-Asocia cada imagen por ID de prenda usando Markdown.
+Solo puedes sugerir prendas que:
+- Estén en la base de datos 'Ropa'
+- Tengan imagen en 'Imagenes_Drive_Convertidas.xlsx' (por ID de prenda)
 
-No inventes productos. No uses imágenes externas.
-
-Formato de ejemplo:
-Este modelo podría gustarte:
+Muestra las imágenes usando Markdown así:
 ![nombre](URL)
+
+No inventes productos ni uses imágenes externas.
 """
 
     response = client.chat.completions.create(
@@ -72,6 +72,7 @@ Este modelo podría gustarte:
             {"role": "user", "content": mensaje_usuario}
         ]
     )
+
     respuesta = response.choices[0].message.content
-    st.markdown("### 🧠 Recomendación del asesor:")
+    st.markdown("### 💡 Recomendación del asesor:")
     st.markdown(respuesta)
